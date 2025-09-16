@@ -1,0 +1,29 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Tugas Buzzer</title>
+<style>
+body{font-family:system-ui,Arial;padding:16px;max-width:720px;margin:auto;}
+.card{border:1px solid #ddd;border-radius:12px;padding:16px;margin:12px 0;}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid #444;cursor:pointer;background:#111;color:#fff;}
+</style>
+</head><body>
+<h1>🎯 Tugas Hari Ini</h1>
+<div id="list"></div>
+
+<script src="api.js"></script>
+<script>
+(async function(){
+  const box = document.getElementById('list');
+  const res = await API.listCampaigns();
+  if(!res.ok){ box.innerHTML = 'Gagal memuat kampanye.'; return; }
+  box.innerHTML = res.data.map(c=>`
+    <div class="card">
+      <div><b>${c.name}</b> — <small>${c.platform.toUpperCase()}</small></div>
+      <div>${c.description||''}</div>
+      <div><small>${c.total_links||0} link</small></div>
+      <a class="btn" href="campaign.html?campaign_id=${encodeURIComponent(c.campaign_id)}">Kerjakan</a>
+    </div>
+  `).join('');
+})();
+</script>
+</body></html>
