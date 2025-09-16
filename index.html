@@ -14,16 +14,33 @@ body{font-family:system-ui,Arial;padding:16px;max-width:720px;margin:auto;}
 <script>
 (async function(){
   const box = document.getElementById('list');
-  const res = await API.listCampaigns();
-  if(!res.ok){ box.innerHTML = 'Gagal memuat kampanye.'; return; }
-  box.innerHTML = res.data.map(c=>`
-    <div class="card">
-      <div><b>${c.name}</b> — <small>${c.platform.toUpperCase()}</small></div>
-      <div>${c.description||''}</div>
-      <div><small>${c.total_links||0} link</small></div>
-      <a class="btn" href="campaign.html?campaign_id=${encodeURIComponent(c.campaign_id)}">Kerjakan</a>
-    </div>
-  `).join('');
+  try {
+    const res = await API.listCampaigns();
+    console.log('API response:', res); // Debug ke Console
+
+    if (!res.ok) {
+      box.innerHTML = '❌ API error: ' + (res.error || 'unknown');
+      return;
+    }
+
+    if (!res.data || res.data.length === 0) {
+      box.innerHTML = '📭 Belum ada kampanye aktif.';
+      return;
+    }
+
+    box.innerHTML = res.data.map(c => `
+      <div class="card">
+        <div><b>${c.name||'(tanpa nama)'}</b> — <small>${(c.platform||'').toUpperCase()}</small></div>
+        <div>${c.description||''}</div>
+        <div><small>${c.total_links||0} link</small></div>
+        <a class="btn" href="campaign.html?campaign_id=${encodeURIComponent(c.campaign_id)}">Kerjakan</a>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = '❌ Fetch gagal: ' + err.message;
+  }
 })();
 </script>
 </body></html>
