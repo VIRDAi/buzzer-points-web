@@ -7,14 +7,17 @@ async function apiGet(path, params = {}) {
   return r.json();
 }
 
-async function apiPost(path, payload) {
+async function apiPost(path, payload){
   const r = await fetch(`${WEB_APP_URL}?fn=${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // Pakai text/plain agar tidak memicu preflight CORS
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(payload),
   });
+  // Kalau mau lihat error response, bisa pakai r.text() dulu
   return r.json();
 }
+
 
 // Global API object
 const API = {
