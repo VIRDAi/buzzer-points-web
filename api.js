@@ -1,5 +1,5 @@
 // === API CONFIG ===
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyoS-FwvUJta3Jp2Yx__O6q9zzBRZ6Pz1evQwjmPgGAdGgndCYsPpy7oXO0pLsEwv7kSA/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz0_z9iTzQ8TCxRFAT0BuGm2Ak2Wbs6iF4hzTpYJqR0e0kvGz0edvvmuiNp-atLuZpi/exec';
 
 async function apiGet(path, params = {}) {
   const q = new URLSearchParams({ fn: path, ...params }).toString();
