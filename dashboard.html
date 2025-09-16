@@ -1,0 +1,65 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Saldo Poin</title>
+<style>
+body{font-family:system-ui;padding:16px;max-width:720px;margin:auto;}
+label{display:block;margin:10px 0 6px;}
+input,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid #444;cursor:pointer;background:#111;color:#fff;margin-top:12px;}
+.bar{height:12px;background:#eee;border-radius:12px;overflow:hidden}
+.fill{height:100%;background:#111}
+</style></head><body>
+<h2>💎 Saldo Poin</h2>
+
+<label>Buzzer ID</label>
+<input id="bid" placeholder="BUZ-0001">
+<button class="btn" id="cek">Cek Saldo</button>
+
+<div id="saldo" style="margin-top:12px;"></div>
+
+<hr style="margin:16px 0"/>
+
+<h3>🪙 Tukar 100 Poin</h3>
+<label>Metode</label>
+<select id="method">
+  <option value="qris">QRIS</option>
+  <option value="dana">DANA</option>
+  <option value="ovo">OVO</option>
+  <option value="bank">Bank</option>
+</select>
+<label>No. e-wallet / Rekening</label>
+<input id="target">
+<button class="btn" id="redeem">Ajukan Penukaran</button>
+
+<div id="out" style="margin-top:12px;"></div>
+
+<script src="api.js"></script>
+<script>
+document.getElementById('cek').onclick = async ()=>{
+  const bid = document.getElementById('bid').value.trim();
+  const box = document.getElementById('saldo');
+  if(!bid){ box.textContent='Masukkan Buzzer ID.'; return; }
+  const r = await API.getBalance(bid);
+  if(!r.ok){ box.textContent='Gagal ambil saldo.'; return; }
+  const b = r.data;
+  const pct = Math.min(100, Math.round((b.points_available||0)/100*100));
+  box.innerHTML = `
+    <div><b>${b.total_points||0}</b> poin total</div>
+    <div><b>${b.points_available||0}</b> poin tersedia</div>
+    <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+    <small>${b.points_available||0}/100 menuju penukaran</small>
+  `;
+};
+
+document.getElementById('redeem').onclick = async ()=>{
+  const out = document.getElementById('out');
+  const buzzer_id = document.getElementById('bid').value.trim();
+  const method = document.getElementById('method').value;
+  const target = document.getElementById('target').value.trim();
+  if(!buzzer_id || !method || !target){ out.textContent='Lengkapi data.'; return; }
+  out.textContent='Mengajukan...';
+  const r = await API.redeem({ buzzer_id, method, target_account: target });
+  out.textContent = r.ok ? '✅ Tiket redeem dibuat. Cek notifikasi kamu.' : ('❌ Gagal: '+(r.error||r.n8n_error||'unknown'));
+};
+</script>
+</body></html>
