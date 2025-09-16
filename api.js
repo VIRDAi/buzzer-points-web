@@ -1,5 +1,5 @@
 <script>
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9B0ACFB72a83Knm5DyJjRG8zRui08LsYRNXustRZsVmY73RVeUOAr3rSI8kkjRXDFbg/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxm1aoGYHMNxPeiU_hJm-7bmIMcDvGuqVdduJHTRlIsBSHIjP9WN78I7lnhl-ODkiBvMg/exec';
 
 async function apiGet(path, params={}){
   const q = new URLSearchParams({fn:path, ...params}).toString();
