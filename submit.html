@@ -1,0 +1,88 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Kirim Bukti</title>
+<style>
+body{font-family:system-ui;padding:16px;max-width:720px;margin:auto;}
+label{display:block;margin:10px 0 6px;}
+input,textarea,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid #444;cursor:pointer;background:#111;color:#fff;margin-top:12px;}
+.note{color:#666;font-size:12px;}
+</style>
+</head><body>
+<h2>📤 Kirim Bukti Komentar</h2>
+<form id="f">
+  <label>Platform</label>
+  <select name="platform">
+    <option value="ig">Instagram</option>
+    <option value="tiktok">TikTok</option>
+  </select>
+
+  <label>Campaign ID</label>
+  <input name="campaign_id" required>
+
+  <label>Link ID (opsional)</label>
+  <input name="link_id" placeholder="LNK-0001">
+
+  <label>Buzzer ID</label>
+  <input name="buzzer_id" required>
+
+  <label>Handle akun (IG/TikTok)</label>
+  <input name="account_handle" required>
+
+  <label>Link komentar (jika ada)</label>
+  <input name="comment_url" placeholder="https://...">
+
+  <label>Teks komentar</label>
+  <textarea name="comment_text" rows="4" required></textarea>
+
+  <label>Upload screenshot (opsional)</label>
+  <input type="file" id="file">
+
+  <div class="note">* Kami menyimpan info teknis (UA/TZ/Screen/Language) untuk anti-kecurangan.</div>
+  <button class="btn" type="submit">Kirim</button>
+</form>
+<div id="out" style="margin-top:14px;"></div>
+
+<script src="api.js"></script>
+<script src="fp.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const campaignFromURL = params.get('campaign_id');
+if (campaignFromURL) document.querySelector('input[name="campaign_id"]').value = campaignFromURL;
+
+document.getElementById('f').onsubmit = async (ev)=>{
+  ev.preventDefault();
+  const out = document.getElementById('out');
+  out.textContent = 'Mengirim...';
+
+  const fd = new FormData(ev.target);
+  const dev = getDeviceSignals();
+  const file = document.getElementById('file').files[0];
+  const screenshot_base64 = await fileToDataURL(file); // "" jika tidak ada
+
+  const payload = {
+    platform:        fd.get('platform'),
+    campaign_id:     fd.get('campaign_id'),
+    link_id:         fd.get('link_id') || '',
+    buzzer_id:       fd.get('buzzer_id'),
+    account_handle:  fd.get('account_handle'),
+    comment_url:     fd.get('comment_url') || '',
+    comment_text:    fd.get('comment_text'),
+    screenshot_base64,
+    ua: dev.ua, tz: dev.tz, screen: dev.screen, lang: dev.lang
+  };
+
+  try{
+    const res = await API.submitProof(payload);
+    if (res.ok){
+      out.innerHTML = '✅ Bukti diterima. Menunggu verifikasi.';
+      ev.target.reset();
+    } else {
+      out.innerHTML = '❌ Gagal: ' + (res.error || res.n8n_error || 'unknown error');
+    }
+  }catch(err){
+    out.textContent = '❌ Error jaringan: ' + err.message;
+  }
+};
+</script>
+</body></html>
