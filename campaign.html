@@ -1,0 +1,33 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Detail Tugas</title>
+<style>body{font-family:system-ui;padding:16px;max-width:720px;margin:auto;}
+.card{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0;}
+.btn{padding:8px 12px;border-radius:10px;border:1px solid #444;cursor:pointer;background:#111;color:#fff;}
+.link{display:flex;justify-content:space-between;gap:10px;align-items:center;}
+</style></head><body>
+<h2>🔗 Link Target</h2>
+<div id="links"></div>
+<p><a class="btn" id="submitBtn">Kirim Bukti Komentar</a></p>
+
+<script src="api.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const campaign_id = params.get('campaign_id');
+
+(async function(){
+  const box = document.getElementById('links');
+  const res = await API.listLinks(campaign_id);
+  if(!res.ok){ box.innerHTML='Gagal memuat link.'; return; }
+  box.innerHTML = res.data.map(x=>`
+    <div class="card link">
+      <a target="_blank" href="${x.url_target}">${x.url_target}</a>
+      <small>min ${x.min_comment_length||0} char</small>
+    </div>
+  `).join('');
+})();
+document.getElementById('submitBtn').onclick = ()=>{
+  location.href = `submit.html?campaign_id=${encodeURIComponent(campaign_id)}`;
+};
+</script>
+</body></html>
